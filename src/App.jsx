@@ -8,6 +8,7 @@ import View from './page/View';
 import Cart from './page/Cart'
 import Login from './page/Login'
 import Registration from './page/Registration'
+import Footer from './Components/Footer'
 
 function App() {
   const [selectedFood, setSelectedFood] = useState(null);
@@ -22,7 +23,7 @@ function App() {
           <Route path='/cart' element={<Cart />} />
           <Route path='/loginn' element={<Login />} />
           <Route path='/signup' element={<Registration />} />
-     
+
         </Routes>
       </BrowserRouter>
       <Toaster

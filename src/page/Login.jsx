@@ -19,6 +19,7 @@ const Login = () => {
     e.preventDefault();
     if (user.email == formData.email || user.password == formData.password) {
       toast.success('Login successful');
+      localStorage.setItem('loginUser',JSON.stringify(retData))
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -26,8 +27,6 @@ const Login = () => {
         });
         navigate('/');
       }, 300);
-      localStorage.setItem('loginUser',JSON.stringify(retData))
-
     } 
     else {
       toast.error('Login failed');
@@ -35,8 +34,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-amber-50 to-amber-100">
-      <div className="relative lg:w-1/2 h-40   lg:h-auto">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-amber-50 to-amber-300">
+      <div className="relative lg:w-1/2 h-20   lg:h-auto">
         <img src={image} alt="Decorative background" className="w-full h-full object-cover hidden   lg:block" />
         <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-amber-900/30 to-transparent flex items-end lg:items-center ps-7 ">
           <div className="sm:text-white ">

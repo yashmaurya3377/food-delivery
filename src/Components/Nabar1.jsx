@@ -12,7 +12,7 @@ const Navbar1 = () => {
   const startChar = formData.name ? formData.name.slice(0, 1) : '';
 
   return (
-    <div className='fixed left-0 right-0 top-0 z-50 '>
+    <div className='left-0 right-0 top-0 z-50 sticky'>
       <div className='bg-black/80 text-white flex justify-between items-center p-5'>
         <div>
           <span className='text-3xl font-bold font-serif'>Food hub</span>
@@ -102,6 +102,7 @@ const Navbar1 = () => {
           </ul>
         </div>
       )}
+      
     </div>
   );
 };

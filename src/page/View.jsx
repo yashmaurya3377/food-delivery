@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { IoIosHeart } from "react-icons/io";
+import toast from 'react-hot-toast';
 
 const View = ({ foodItem }) => {
     const [Comment, setcomment] = useState([]);
     const [viewreview, setviewreview] = useState(true);
 
+    const navigate = useNavigate()
     useEffect(() => {
         const review = async () => {
             const data = await fetch('https://dummyjson.com/comments')
@@ -16,11 +18,20 @@ const View = ({ foodItem }) => {
         }
         review()
     }, [])
-    console.log(Comment);
+    const handleOrder = () => {
+        toast.success('order after add to list')
+      
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
+
+        navigate('/')
+    }
 
 
     return (
-        <div className='min-h-screen bg-gray-100 py-8 px-4 sm:px-8 mt-18'>
+        <div className='min-h-screen bg-gray-100  px-4 sm:px-8 '>
             {foodItem ? (
                 <div className=' mx-auto bg-white rounded-xl shadow-md overflow-hidden'>
                     <div className='md:flex'>
@@ -28,7 +39,7 @@ const View = ({ foodItem }) => {
                             <img
                                 src={foodItem.image}
                                 alt={foodItem.name}
-                                className='w-full h-full object-cover'
+                                className='w-full h-fit object-cover'
                             />
                         </div>
                         <div className='p-8 md:w-1/2'>
@@ -56,7 +67,7 @@ const View = ({ foodItem }) => {
                             </div>
                             <div className='flex justify-between items-center'>
                                 <span className='text-2xl font-bold text-yellow-600'>₹{foodItem.reviewCount * 10}</span>
-                                <button className='bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-300'>
+                                <button onClick={handleOrder} className='bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-300'>
                                     Order Now
                                 </button>
                             </div>

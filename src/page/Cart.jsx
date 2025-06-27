@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Footer from '../Components/Footer';
 
 const Cart = () => {
     // Initialize cart items with quantity property
@@ -50,9 +51,9 @@ const Cart = () => {
     }, [cartItems]);
 
     return (
-        <div className='min-h-screen bg-amber-50 py-4 md:py-8 px-2 sm:px-4'>
+        <div className='min-h-screen bg-amber-50 '>
             <div className='max-w-4xl mx-auto'>
-                <div className='bg-amber-300 mt-4 md:mt-8 py-4 md:py-6 px-4 sm:px-6 rounded-xl shadow-lg'>
+                <div className='bg-amber-300  md:mt-1 py-4 md:py-6 px-4 sm:px-6 rounded-xl shadow-lg'>
                     {/* ... (header remains the same) ... */}
 
                     {cartItems.length === 0 ? (
@@ -169,6 +170,7 @@ const Cart = () => {
                     )}
                 </div>
             </div>
+            <Footer/>
         </div>
     );
 };

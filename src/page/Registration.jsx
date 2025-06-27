@@ -322,7 +322,7 @@ const Registration = () => {
   };
 
   return (
-    <div className='mt-18  flex overflow-x-hidden'>
+    <div className=' flex overflow-x-hidden'>
       {/* Form Section */}
       <div className='flex flex-col w-full lg:w-1/2 px-8 py-12 bg-gradient-to-b from-blue-200 via-gray-200 to-green-300'>
         <form onSubmit={handleSubmit} className='space-y-4 max-w-md mx-auto w-full'>
