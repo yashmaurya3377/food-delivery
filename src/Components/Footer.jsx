@@ -55,7 +55,7 @@ const Footer = () => {
         >
           {/* Column 1 - About */}
           <motion.div variants={itemVariants}>
-            <h3 className="text-xl font-bold mb-4">Yashoda Tech Solutions</h3>
+            <h3 className="text-xl font-bold mb-4">Food hub</h3>
             <p className="mb-4">
               Building digital experiences that drive business growth and innovation.
               We combine technical excellence with business acumen to deliver impactful solutions.
@@ -200,7 +200,7 @@ const Footer = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <p>© {new Date().getFullYear()} Yashoda Tech Solutions. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} Food hub. All Rights Reserved.</p>
           <motion.div 
             className="mt-2 flex justify-center space-x-4"
             variants={containerVariants}

@@ -1,23 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
+import Meals from './MealsApi';
+import { FaStarHalfAlt, } from "react-icons/fa"
+import { MdOutlineStarPurple500 } from "react-icons/md";
 
-const HomePage = ({ setSelectedFood }) => {
+const HomePage = ({ setSelectedFood, search }) => {
   const [items, setItems] = useState(false);
   const [food, setFood] = useState([]);
-  const [filterfood, setfilterFood] = useState([]);
+  const [filterfood, setFilterFood] = useState([]);
   const [cartItem, setCartItem] = useState([]);
   const [activeTag, setActiveTag] = useState(null);
+  const [filterToMeals, setFilterToMeals] = useState('');
   const navigate = useNavigate();
 
-
   const apiFetch = async () => {
-    const apiData = await fetch('https://dummyjson.com/recipes')
-    const obj = await apiData.json();
-    const data = obj.recipes;
-    setFood(data);
-    setfilterFood(data);
+    try {
+      const apiData = await fetch('https://dummyjson.com/recipes');
+      const obj = await apiData.json();
+      const data = obj.recipes;
+      setFood(data);
+      setFilterFood(data);
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+      toast.error('Failed to load recipes');
+    }
   };
+
+  // Filter food based on search term
+  useEffect(() => {
+    if (search && search.trim() !== '') {
+      const filtered = filterfood.filter(item =>
+        item.name.toLowerCase().includes(search.toLowerCase()) ||
+        item.cuisine.toLowerCase().includes(search.toLowerCase()) ||
+        item.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+      );
+      setFood(filtered);
+    } else {
+      setFood(filterfood);
+    }
+  }, [search, filterfood]);
 
   useEffect(() => {
     apiFetch();
@@ -35,8 +57,6 @@ const HomePage = ({ setSelectedFood }) => {
 
   const handleOrder = (foodItem) => {
     const existingItems = JSON.parse(localStorage.getItem('food')) || [];
-
-    // Check if item already exists in cart
     const itemExists = existingItems.some(item => item.id === foodItem.id);
 
     if (itemExists) {
@@ -46,19 +66,15 @@ const HomePage = ({ setSelectedFood }) => {
           color: 'yellow',
         }
       });
-
       navigate('/cart');
       window.scrollTo({
         top: 0,
         behavior: 'smooth',
       });
-      
       return;
     }
 
-    // Add new item to cart
     const updatedItems = [...existingItems, foodItem];
-
     setCartItem(updatedItems);
     localStorage.setItem('food', JSON.stringify(updatedItems));
 
@@ -79,20 +95,25 @@ const HomePage = ({ setSelectedFood }) => {
       navigate('/cart');
     }, 1000);
   };
-  const handlefilter = (e, i) => {
-    const filterTag = e.toLowerCase();
 
+  const handleFilter = (e, i) => {
+    const filterTag = e.toLowerCase();
+    setFilterToMeals(filterTag);
     const filteredItems = filterfood.filter((foodItem) =>
       foodItem.tags.some(tag => tag.toLowerCase() === filterTag)
     );
-    setFood(filteredItems)
-    setActiveTag(i)
-    console.log("Filtered items:", filteredItems);
+    setFood(filteredItems);
+    setActiveTag(i);
+  };
 
+  const resetFilters = () => {
+    setFood(filterfood);
+    setActiveTag(null);
+    setFilterToMeals('');
   };
 
   return (
-    <div className="bg-[url('/poster.jpg')] bg-center bg-cover bg-no-repeat w-full h-96 ">
+    <div className="bg-[url('/poster.jpg')] bg-center bg-cover bg-no-repeat w-full h-96 mt-19">
       <div className="bg-black/50 h-full w-full flex flex-col justify-center items-center px-4 py-16 text-white">
         <h1 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-center animate-fadeIn">
           FAST & TASTY DELIVERY
@@ -136,16 +157,27 @@ const HomePage = ({ setSelectedFood }) => {
           </div>
         </div>
       </div>
+
       {items && (
         <div className="bg-emerald-50 p-4 rounded-lg shadow-sm border border-emerald-100 mb-6">
-          <h2 className="text-lg font-semibold text-emerald-800 mb-3">Filter by Tags</h2>
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg font-semibold text-emerald-800">Filter by Tags</h2>
+            {activeTag !== null && (
+              <button
+                onClick={resetFilters}
+                className="text-sm text-emerald-600 hover:text-emerald-800"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
             {[...new Set(filterfood.flatMap(item => item.tags))].map((tag, i) => (
               <button
-                onClick={() => handlefilter(tag, i)}
+                onClick={() => handleFilter(tag, i)}
                 key={i}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all 
-                     ${activeTag === i
+                  ${activeTag === i
                     ? 'bg-emerald-600 text-black shadow-md'
                     : 'bg-black/20 text-emerald-700 border border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300'}`}
                 aria-label={`Filter by ${tag}`}
@@ -157,14 +189,19 @@ const HomePage = ({ setSelectedFood }) => {
         </div>
       )}
 
+      <div className='bg-black/30 min-h-screen py-8'>
+        <h1 className='bg-blue-300 text-center text-2xl font-bold italic py-4 sticky top-0 z-10 shadow-md'>
+          Food Items ({food.length}) {search && `- Search: "${search}"`}
+        </h1>
 
-      {(
-        <div className='bg-black/30 min-h-screen py-8'>
-          <h1 className='bg-blue-300 text-center text-2xl font-bold italic py-4 sticky top-0 z-10 shadow-md'>
-            Food Items ({food.length})
-          </h1>
+        {food.length === 0 ? (
+          <div className="text-center py-20">
+            <h2 className="text-2xl font-bold text-white">No items found</h2>
+            <p className="text-white mt-2">Try a different search term or filter</p>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 sm:px-8 mt-8'>
+          </div>
+        ) : (
+          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-6 px-4 sm:px-8 mt-8'>
             {food.map((item) => (
               <div
                 key={item.id}
@@ -187,15 +224,20 @@ const HomePage = ({ setSelectedFood }) => {
                       ₹{(item.reviewCount * 10).toFixed(2)}
                     </span>
                     <div className='flex items-center'>
-                      <span className='text-yellow-500'>★</span>
-                      <span className='text-gray-600 ml-1'>{item.rating}</span>
+                      {[...Array(Math.floor(item.rating))].map((_, i) => (
+                        <span key={i} className='text-yellow-500'><MdOutlineStarPurple500 /></span>
+                      ))}
+                      {item.rating % 1 >= 0.3 && (
+                        <span className='text-yellow-500'><FaStarHalfAlt /></span>
+                      )}
+                      <span className='text-yellow-500 ml-1 text-sm'>({item.rating})</span>
                     </div>
                   </div>
 
-                  <div className='flex justify-between mt-4 space-x-2'>
+                  <div className='flex justify-between mt-4 sm:mt-1 gap-1'>
                     <button
                       onClick={() => handleOrder(item)}
-                      className='flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300'
+                      className='flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-medium py-2 px-4 sm:px-0 rounded-lg transition-colors duration-300 text-sm'
                     >
                       Order Now
                     </button>
@@ -211,8 +253,10 @@ const HomePage = ({ setSelectedFood }) => {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+
+        <Meals search={search} filteredFood={filterToMeals} />
+      </div>
     </div>
   );
 };

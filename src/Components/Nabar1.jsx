@@ -3,16 +3,22 @@ import { Link } from 'react-router-dom';
 import { CiBoxList } from "react-icons/ci";
 import { RiFileList3Line } from "react-icons/ri";
 
-const Navbar1 = () => {
+const Navbar1 = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const userData = JSON.parse(localStorage.getItem('loginUser')) || {};
   const [formData, setFormData] = useState(userData);
+  const [searchitem, setsearchitem] = useState('');
 
+  const handlesearch = (e) => {
+    let text = e.target.value
+    props.fun(text)
+    setsearchitem(text)
+  }
   // Get the first character of the name if no image exists
   const startChar = formData.name ? formData.name.slice(0, 1) : '';
 
   return (
-    <div className='left-0 right-0 top-0 z-50 sticky'>
+    <div className='left-0 right-0 top-0 z-55 fixed'>
       <div className='bg-black/80 text-white flex justify-between items-center p-5'>
         <div>
           <span className='text-3xl font-bold font-serif'>Food hub</span>
@@ -20,7 +26,9 @@ const Navbar1 = () => {
 
         {/* Desktop Navigation */}
         <div className='hidden md:block'>
+          
           <ul className='flex gap-10 items-center'>
+          <input type="text" name="search" id="" placeholder='search' className=' border my-1' onChange={handlesearch} />
             <li>
               <Link to={'/'} className='hover:text-gray-300'>Home</Link>
             </li>
@@ -54,6 +62,7 @@ const Navbar1 = () => {
 
         {/* Mobile menu button */}
         <div className='md:hidden'>
+          <input type="text" name="search" id="" placeholder='search' className=' border my-1' onChange={handlesearch} />
           <button
             onClick={() => setIsOpen(!isOpen)}
             className='text-white focus:outline-none'
@@ -102,7 +111,7 @@ const Navbar1 = () => {
           </ul>
         </div>
       )}
-      
+
     </div>
   );
 };

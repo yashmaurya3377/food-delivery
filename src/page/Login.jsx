@@ -34,7 +34,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-amber-50 to-amber-300">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-amber-50 to-amber-300 ">
       <div className="relative lg:w-1/2 h-20   lg:h-auto">
         <img src={image} alt="Decorative background" className="w-full h-full object-cover hidden   lg:block" />
         <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-amber-900/30 to-transparent flex items-end lg:items-center ps-7 ">

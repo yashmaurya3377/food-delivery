@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../Components/Footer';
 
 const Cart = () => {
-    // Initialize cart items with quantity property
+    const [order, setOrder] = useState([]);
     const [cartItems, setCartItems] = useState(() => {
         const savedItems = JSON.parse(localStorage.getItem('food')) || [];
         return savedItems.map(item => ({
@@ -12,6 +12,7 @@ const Cart = () => {
         }));
     });
 
+     const navigate=useNavigate()
     // Update quantity for specific item
     const updateQuantity = (itemId, change) => {
         setCartItems(prevItems => 
@@ -45,21 +46,37 @@ const Cart = () => {
         0);
     };
 
-    // Save to localStorage whenever cart changes
+    // Handle order submission
+    const handleOrder = () => {
+        const orderData = {
+            items: cartItems,
+            subtotal: calculateCartTotal(),
+            delivery: 50,
+            total: calculateCartTotal() + 50,
+            orderDate: new Date().toISOString()
+        };
+        
+        console.log('Order data:', orderData);
+        setOrder(orderData);
+        sessionStorage.setItem('orderItems', JSON.stringify(orderData));
+        navigate('/order')
+    };
+
     useEffect(() => {
         localStorage.setItem('food', JSON.stringify(cartItems));
     }, [cartItems]);
 
     return (
-        <div className='min-h-screen bg-amber-50 '>
+        <div className='min-h-screen bg-amber-50 mt-19'>
             <div className='max-w-4xl mx-auto'>
-                <div className='bg-amber-300  md:mt-1 py-4 md:py-6 px-4 sm:px-6 rounded-xl shadow-lg'>
-                    {/* ... (header remains the same) ... */}
-
+                <div className='bg-amber-300 md:mt-1 py-4 md:py-6 px-4 sm:px-6 rounded-xl shadow-lg'>
                     {cartItems.length === 0 ? (
                         <div className='text-center py-8 md:py-12'>
                             <p className='text-lg sm:text-xl text-amber-700'>Your cart is empty</p>
-                            <Link to={'/'} className='mt-4 bg-amber-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-amber-700 transition'>
+                            <Link 
+                                to={'/'} 
+                                className='mt-4 inline-block bg-amber-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-amber-700 transition'
+                            >
                                 Browse Menu
                             </Link>
                         </div>
@@ -69,44 +86,51 @@ const Cart = () => {
                             <table className='w-full hidden md:table'>
                                 <thead className='bg-amber-400'>
                                     <tr>
-                                        <th>Item</th>
-                                        <th>Image</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        <th>Remove</th>
+                                        <th className='text-left p-3'>Item</th>
+                                        <th className='text-left p-3'>Image</th>
+                                        <th className='text-left p-3'>Quantity</th>
+                                        <th className='text-left p-3'>Price</th>
+                                        <th className='text-left p-3'>Remove</th>
                                     </tr>
                                 </thead>
                                 <tbody className='divide-y divide-amber-200'>
                                     {cartItems.map((item) => (
-                                        <tr key={item.id}>
-                                            <td>{item.name}</td>
-                                            <td>
-                                                <img src={item.image} alt={item.name} className='h-14 w-14 object-cover rounded-lg' />
+                                        <tr key={item.id} className='hover:bg-amber-100'>
+                                            <td className='p-3'>{item.name}</td>
+                                            <td className='p-3'>
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.name} 
+                                                    className='h-14 w-14 object-cover rounded-lg' 
+                                                    loading='lazy'
+                                                />
                                             </td>
-                                            <td>
+                                            <td className='p-3'>
                                                 <div className='flex items-center space-x-2'>
                                                     <button 
                                                         onClick={() => updateQuantity(item.id, -1)}
-                                                        className='w-7 h-7 rounded-full bg-amber-500 text-white'
+                                                        className='w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition'
+                                                        aria-label='Decrease quantity'
                                                     >
                                                         -
                                                     </button>
-                                                    <span>{item.quantity}</span>
+                                                    <span className='min-w-[20px] text-center'>{item.quantity}</span>
                                                     <button 
                                                         onClick={() => updateQuantity(item.id, 1)}
-                                                        className='w-7 h-7 rounded-full bg-amber-500 text-white'
+                                                        className='w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition'
+                                                        aria-label='Increase quantity'
                                                     >
                                                         +
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td>
-                                                ₹{calculateItemSubtotal(item.reviewCount * 10, item.quantity)}
+                                            <td className='p-3'>
+                                                ₹{calculateItemSubtotal(item.reviewCount * 10, item.quantity).toFixed(2)}
                                             </td>
-                                            <td>
+                                            <td className='p-3'>
                                                 <button 
                                                     onClick={() => handleDelete(item.id)}
-                                                    className='bg-red-700 hover:bg-red-400 rounded-2xl px-2 text-white py-1'
+                                                    className='bg-red-700 hover:bg-red-600 rounded-lg px-3 text-white py-1 transition'
                                                 >
                                                     Remove
                                                 </button>
@@ -121,25 +145,44 @@ const Cart = () => {
                                 {cartItems.map((item) => (
                                     <div key={item.id} className='bg-amber-200/50 p-4 rounded-lg'>
                                         <div className='flex justify-between'>
-                                            <div>
-                                                <h3>{item.name}</h3>
-                                                <p>₹{item.reviewCount * 10} each</p>
+                                            <div className='flex-1'>
+                                                <h3 className='font-medium'>{item.name}</h3>
+                                                <p className='text-sm'>₹{(item.reviewCount * 10).toFixed(2)} each</p>
                                             </div>
-                                            <img src={item.image} alt={item.name} className='h-14 w-14 object-cover rounded-lg' />
+                                            <img 
+                                                src={item.image} 
+                                                alt={item.name} 
+                                                className='h-14 w-14 object-cover rounded-lg ml-2' 
+                                                loading='lazy'
+                                            />
                                         </div>
                                         <div className='flex items-center justify-between mt-3'>
-                                            <div className='flex items-center space-x-3'>
-                                                <button onClick={() => updateQuantity(item.id, -1)}>-</button>
-                                                <span>{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.id, 1)}>+</button>
+                                            <div className='flex items-center space-x-3 bg-amber-100 px-3 py-1 rounded-full'>
+                                                <button 
+                                                    onClick={() => updateQuantity(item.id, -1)}
+                                                    className='w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition'
+                                                    aria-label='Decrease quantity'
+                                                >
+                                                    -
+                                                </button>
+                                                <span className='min-w-[20px] text-center'>{item.quantity}</span>
+                                                <button 
+                                                    onClick={() => updateQuantity(item.id, 1)}
+                                                    className='w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition'
+                                                    aria-label='Increase quantity'
+                                                >
+                                                    +
+                                                </button>
                                             </div>
-                                            <p>₹{calculateItemSubtotal(item.reviewCount * 10, item.quantity)}</p>
+                                            <p className='font-medium'>
+                                                ₹{calculateItemSubtotal(item.reviewCount * 10, item.quantity).toFixed(2)}
+                                            </p>
                                         </div>
                                         <button 
                                             onClick={() => handleDelete(item.id)}
-                                            className='mt-2 bg-red-700 hover:bg-red-400 rounded-2xl px-2 text-white py-1 w-full'
+                                            className='mt-3 bg-red-700 hover:bg-red-600 rounded-lg px-3 text-white py-2 w-full transition'
                                         >
-                                            Remove
+                                            Remove Item
                                         </button>
                                     </div>
                                 ))}
@@ -150,18 +193,22 @@ const Cart = () => {
                                 <div className='bg-white p-4 sm:p-6 rounded-lg shadow-md w-full md:w-80'>
                                     <h3 className='text-lg font-bold text-amber-800 mb-4'>Order Summary</h3>
                                     <div className='flex justify-between mb-2'>
-                                        <span>Subtotal</span>
-                                        <span>₹{calculateCartTotal()}</span>
+                                        <span>Subtotal ({cartItems.length} items)</span>
+                                        <span>₹{calculateCartTotal().toFixed(2)}</span>
                                     </div>
                                     <div className='flex justify-between mb-4'>
-                                        <span>Delivery</span>
-                                        <span>₹50</span>
+                                        <span>Delivery Fee</span>
+                                        <span>₹50.00</span>
                                     </div>
-                                    <div className='border-t border-amber-200 pt-4 flex justify-between font-bold'>
+                                    <div className='border-t border-amber-200 pt-4 flex justify-between font-bold text-lg'>
                                         <span>Total</span>
-                                        <span>₹{calculateCartTotal() + 50}</span>
+                                        <span>₹{(calculateCartTotal() + 50).toFixed(2)}</span>
                                     </div>
-                                    <button className='w-full mt-6 bg-amber-600 text-white py-3 rounded-lg font-medium hover:bg-amber-700 transition'>
+                                    <button 
+                                        onClick={handleOrder}
+                                        className='w-full mt-6 bg-amber-600 text-white py-3 rounded-lg font-medium hover:bg-amber-700 transition disabled:bg-amber-400'
+                                        disabled={cartItems.length === 0}
+                                    >
                                         Proceed to Checkout
                                     </button>
                                 </div>
